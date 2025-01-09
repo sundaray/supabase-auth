@@ -1,8 +1,6 @@
-import { auth } from "@/auth"
- 
 export default async function AdminPage() {
-  const session = await auth()
- 
+  const session = false;
+
   if (session?.user?.role === "user") {
     return (
       <div className="mx-auto mt-12 max-w-lg text-center">
@@ -12,12 +10,12 @@ export default async function AdminPage() {
           &quot;admin&quot; status.
         </p>
       </div>
-    )
+    );
   }
- 
+
   return (
     <h1 className="mt-12 text-center text-xl font-medium text-green-600">
       Welcome Admin
     </h1>
-  )
+  );
 }

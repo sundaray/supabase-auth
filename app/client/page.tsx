@@ -31,8 +31,6 @@ export default function ClientPage() {
     );
   }
 
-  console.log("User session: ", session);
-
   return (
     <div className="mt-12 text-center">
       <h1 className="text-xl font-medium text-green-600">User Authenticated</h1>
