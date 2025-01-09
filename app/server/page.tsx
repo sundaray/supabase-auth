@@ -1,9 +1,12 @@
-import { auth } from "@/auth";
+import { createClient } from "@/supabase/server";
 
 export default async function ServerPage() {
-  const session = await auth();
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  if (!session) {
+  if (!user) {
     return (
       <div className="mt-12 text-center">
         <h1 className="text-xl font-medium text-red-600">
@@ -21,7 +24,7 @@ export default async function ServerPage() {
   return (
     <div className="mt-12 text-center">
       <h1 className="text-xl font-medium text-green-600">User Authenticated</h1>
-      <p className="mt-4 text-sm">User email: {session?.user?.email}</p>
+      <p className="mt-4 text-sm">User email: {user?.email}</p>
       <p className="mt-4 font-medium text-gray-700">
         This is a Server Component.
       </p>

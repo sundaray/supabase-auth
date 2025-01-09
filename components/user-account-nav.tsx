@@ -1,6 +1,5 @@
 import React from "react";
 import Link from "next/link";
-import { auth } from "@/auth";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { buttonVariants } from "@/components/ui/button";
@@ -11,11 +10,15 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { SignOut } from "@/components/sign-out";
+import { createClient } from "@/supabase/server";
 
 export async function UserAccountNav() {
-  const session = await auth();
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  if (!session) {
+  if (!user) {
     return (
       <Link
         href="/signin"
@@ -28,13 +31,15 @@ export async function UserAccountNav() {
     );
   }
 
+  console.log("User in server component: ", user);
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger>
         <Avatar>
-          <AvatarImage src={session.user?.image || undefined} />
+          {/* <AvatarImage src={user?.image || undefined} /> */}
           <AvatarFallback>
-            {session.user!.email!.slice(0, 2).toUpperCase()}
+            {user!.email!.slice(0, 2).toUpperCase()}
           </AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>

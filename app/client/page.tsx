@@ -1,11 +1,11 @@
 "use client";
 
-import { useCurrentSession } from "@/hooks/use-current-session";
+import { useSession } from "@/hooks/use-session";
 
 import { Icons } from "@/components/icons";
 
 export default function ClientPage() {
-  const { session, status } = useCurrentSession();
+  const { session, status } = useSession();
 
   if (status === "loading") {
     return (
@@ -31,10 +31,15 @@ export default function ClientPage() {
     );
   }
 
+  console.log("User session: ", session);
+
   return (
     <div className="mt-12 text-center">
       <h1 className="text-xl font-medium text-green-600">User Authenticated</h1>
       <p className="mt-4 text-sm">User email: {session?.user?.email}</p>
+      <p className="text-sm">
+        User role: {session?.user?.role || "Not available"}
+      </p>
       <p className="mt-4 font-medium text-gray-700">
         This is a Client Component.
       </p>
