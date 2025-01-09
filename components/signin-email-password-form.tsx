@@ -10,17 +10,17 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Icons } from "@/components/icons";
 
-import { signInWithEmailAndPassword } from "@/app/auth-actions";
+import { signUpWithEmailAndPassword } from "@/app/auth-actions";
 import { signInWithEmailAndPasswordSchema } from "@/schema";
 
 export function SignInEmailPasswordForm({ next }: { next: string }) {
-  const boundSignInWithEmailAndPassword = signInWithEmailAndPassword.bind(
+  const boundSignUpWithEmailAndPassword = signUpWithEmailAndPassword.bind(
     null,
     next,
   );
 
   const [lastResult, formAction, isPending] = useActionState(
-    boundSignInWithEmailAndPassword,
+    boundSignUpWithEmailAndPassword,
     undefined,
   );
 
@@ -41,6 +41,11 @@ export function SignInEmailPasswordForm({ next }: { next: string }) {
 
   return (
     <form id={form.id} onSubmit={form.onSubmit} action={formAction} noValidate>
+      {form.errors && (
+        <div className="mt-2 rounded border border-red-200 bg-red-50 p-2 text-center text-sm text-red-600">
+          {form.errors}
+        </div>
+      )}
       <div className="grid gap-4">
         <div className="grid gap-2">
           <Label htmlFor="email" className="text-gray-700">

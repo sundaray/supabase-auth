@@ -10,7 +10,23 @@ import { signInWithEmailAndPasswordSchema } from "@/schema";
  * Sign In With Google
  ************************************************/
 
-export async function signInWithGoogle(from: string) {}
+export async function signInWithGoogle(next: string) {
+  try {
+    const supabase = await createClient();
+
+    await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/api/auth/v1/callback?next=${next}`,
+      },
+    });
+  } catch (error) {
+    return {
+      error: true,
+      message: "Something went wrong. Please try again.",
+    };
+  }
+}
 
 /************************************************
  * Sign In With Email (Magic Link)
@@ -56,10 +72,10 @@ export async function signInWithEmail(
 }
 
 /************************************************
- * Sign In With Email and Password
+ * Sign Up With Email and Password
  ************************************************/
 
-export async function signInWithEmailAndPassword(
+export async function signUpWithEmailAndPassword(
   next: string,
   prevState: unknown,
   formData: FormData,
@@ -75,7 +91,7 @@ export async function signInWithEmailAndPassword(
   try {
     const supabase = await createClient();
 
-    const { error } = await supabase.auth.signUp({
+    const { data, error } = await supabase.auth.signUp({
       email: submission.value.email,
       password: submission.value.password,
       options: {
@@ -83,11 +99,16 @@ export async function signInWithEmailAndPassword(
       },
     });
 
+    console.log("Signup response:", { data, error });
+
     if (error) {
       return submission.reply({
         formErrors: [error.message],
       });
     }
+
+    // Log the user object to see what we got back
+    console.log("User data:", data?.user);
 
     return submission.reply({
       formErrors: ["Check your email for email confirmation"],
