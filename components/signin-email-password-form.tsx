@@ -42,7 +42,7 @@ export function SignInEmailPasswordForm({ next }: { next: string }) {
   return (
     <form id={form.id} onSubmit={form.onSubmit} action={formAction} noValidate>
       {form.errors && (
-        <div className="mt-2 rounded border border-red-200 bg-red-50 p-2 text-center text-sm text-red-600">
+        <div className="mb-2 rounded border border-red-200 bg-red-50 p-2 text-center text-sm text-red-600">
           {form.errors}
         </div>
       )}

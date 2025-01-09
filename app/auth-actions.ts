@@ -50,6 +50,7 @@ export async function signInWithEmail(
     return submission.reply();
   }
 
+  let errorOccurred = false;
   try {
     const supabase = await createClient();
 
@@ -70,9 +71,14 @@ export async function signInWithEmail(
       formErrors: ["Check your email for the login link!"],
     });
   } catch (error) {
+    errorOccurred = true;
     return submission.reply({
       formErrors: ["An unexpected error occurred."],
     });
+  } finally {
+    if (!errorOccurred) {
+      redirect("/signin/check-email");
+    }
   }
 }
 
