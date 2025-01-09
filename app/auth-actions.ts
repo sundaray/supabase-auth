@@ -71,6 +71,32 @@ export async function signInWithEmailAndPassword(
   if (submission.status !== "success") {
     return submission.reply();
   }
+
+  try {
+    const supabase = await createClient();
+
+    const { error } = await supabase.auth.signUp({
+      email: submission.value.email,
+      password: submission.value.password,
+      options: {
+        emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/api/auth/confirm?next=${next}`,
+      },
+    });
+
+    if (error) {
+      return submission.reply({
+        formErrors: [error.message],
+      });
+    }
+
+    return submission.reply({
+      formErrors: ["Check your email for email confirmation"],
+    });
+  } catch (error) {
+    return submission.reply({
+      formErrors: ["An unexpected error occurred."],
+    });
+  }
 }
 
 /************************************************
