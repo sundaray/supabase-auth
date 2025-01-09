@@ -1,7 +1,12 @@
-export default async function AdminPage() {
-  const session = false;
+import { createClient } from "@/supabase/server";
 
-  if (session?.user?.role === "user") {
+export default async function AdminPage() {
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (user?.role === "user") {
     return (
       <div className="mx-auto mt-12 max-w-lg text-center">
         <h1 className="text-xl font-medium text-red-600">Admin Access Only</h1>
