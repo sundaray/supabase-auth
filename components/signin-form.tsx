@@ -17,7 +17,7 @@ export function SigninForm() {
         Sign in to your account
       </h2>
       <div className="mt-10 grid gap-4">
-        <SignInGoogleForm from={next} />
+        <SignInGoogleForm next={next} />
         <div className="relative">
           <div className="absolute inset-0 flex items-center">
             <span className="w-full border-t" />

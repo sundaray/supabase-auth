@@ -11,20 +11,25 @@ import { signInWithEmailAndPasswordSchema } from "@/schema";
  ************************************************/
 
 export async function signInWithGoogle(next: string) {
+  let authUrl;
   try {
     const supabase = await createClient();
 
-    await supabase.auth.signInWithOAuth({
+    const { data } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/api/auth/v1/callback?next=${next}`,
+        redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/api/auth/callback?next=${next}`,
       },
     });
+
+    authUrl = data.url;
   } catch (error) {
     return {
       error: true,
       message: "Something went wrong. Please try again.",
     };
+  } finally {
+    redirect(authUrl as string);
   }
 }
 

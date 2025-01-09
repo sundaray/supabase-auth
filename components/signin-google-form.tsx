@@ -5,8 +5,8 @@ import { useActionState } from "react";
 import { Icons } from "@/components/icons";
 import { signInWithGoogle } from "@/app/auth-actions";
 
-export function SignInGoogleForm({ from }: { from: string }) {
-  const boundGoogleSignIn = signInWithGoogle.bind(null, from);
+export function SignInGoogleForm({ next }: { next: string }) {
+  const boundGoogleSignIn = signInWithGoogle.bind(null, next);
 
   const [formState, formAction, isPending] = useActionState(
     boundGoogleSignIn,
