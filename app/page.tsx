@@ -1,5 +1,3 @@
 export default function HomePage() {
-  return (
-    <h1 className="mt-12 text-xl font-medium text-center">Welcome Home</h1>
-  );
+  return <h1 className="text-center text-xl font-medium">Welcome Home</h1>;
 }

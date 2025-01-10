@@ -132,6 +132,64 @@ export async function signUpWithEmailAndPassword(
 }
 
 /************************************************
+ * Sign In With Email and Password
+ ************************************************/
+
+export async function signInWithEmailAndPassword(
+  next: string,
+  prevState: unknown,
+  formData: FormData,
+) {
+  const submission = parseWithZod(formData, {
+    schema: signInWithEmailAndPasswordSchema,
+  });
+
+  if (submission.status !== "success") {
+    return submission.reply();
+  }
+
+  let errorOccurred = false;
+
+  try {
+    const supabase = await createClient();
+
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: submission.value.email,
+      password: submission.value.password,
+    });
+
+    console.log("Email/password sign in data: ", data);
+    console.log("Email/password sign in error: ", error);
+
+    if (error) {
+      errorOccurred = true;
+
+      // Check if it's an invalid credentials error
+      if (error.status === 400 && error.code === "invalid_credentials") {
+        return submission.reply({
+          formErrors: ["The email or password you entered is incorrect."],
+        });
+      }
+
+      // Handle any other Supabase auth errors
+      return submission.reply({
+        formErrors: ["Something went wrong. Please try again."],
+      });
+    }
+  } catch (error) {
+    errorOccurred = true;
+    return submission.reply({
+      formErrors: ["Something went wrong. Please try again."],
+    });
+  } finally {
+    // Only redirect if no errors occurred
+    if (!errorOccurred) {
+      redirect(next);
+    }
+  }
+}
+
+/************************************************
  * Sign Out Handler
  ************************************************/
 
