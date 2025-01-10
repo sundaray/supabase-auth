@@ -12,7 +12,7 @@ import { Icons } from "@/components/icons";
 import { signInWithEmailSchema } from "@/schema";
 import { signInWithEmail } from "@/app/auth-actions";
 
-export function SignInEmailForm({ next }: { next: string }) {
+export function SignUpEmailForm({ next }: { next: string }) {
   const boundSignInWithEmail = signInWithEmail.bind(null, next);
 
   const [lastResult, formAction, isPending] = useActionState(
@@ -55,10 +55,10 @@ export function SignInEmailForm({ next }: { next: string }) {
         {isPending ? (
           <>
             <Icons.loader className="size-3 animate-spin" />
-            Signing in...
+            Signing up...
           </>
         ) : (
-          "Sign in"
+          "Sign up"
         )}
       </Button>
     </form>

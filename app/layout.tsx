@@ -24,7 +24,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
           <header>
             <MainNav items={navbarLinks.main} />
           </header>
-          <main className="flex-1">{children}</main>
+          <main className="flex-1 py-16">{children}</main>
         </SessionProvider>
       </body>
     </html>

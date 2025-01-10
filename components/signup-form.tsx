@@ -3,23 +3,23 @@
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
-import { SignInGoogleForm } from "@/components/signin-google-form";
-import { SignInEmailForm } from "@/components/signin-email-form";
-import { SignInEmailPasswordForm } from "@/components/signin-email-password-form";
+import { SignUpGoogleForm } from "@/components/signup-google-form";
+import { SignUpEmailForm } from "@/components/signup-email-form";
+import { SignUpEmailPasswordForm } from "@/components/signup-email-password-form";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-export function SignInForm() {
+export function SignUpForm() {
   const searchParams = useSearchParams();
   const next = searchParams.get("next") || "/";
 
   return (
     <div className="sm:mx-auto sm:max-w-[480px]">
       <h2 className="text-center text-2xl font-bold tracking-tight text-primary">
-        Sign in to your account
+        Sign up to create an account
       </h2>
       <div className="mt-10 border px-6 py-12 sm:rounded-lg sm:px-12">
         <div className="grid gap-4">
-          <SignInGoogleForm next={next} />
+          <SignUpGoogleForm next={next} />
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
               <span className="w-full border-t" />
@@ -34,21 +34,21 @@ export function SignInForm() {
               <TabsTrigger value="password">Password</TabsTrigger>
             </TabsList>
             <TabsContent value="email-link">
-              <SignInEmailForm next={next} />
+              <SignUpEmailForm next={next} />
             </TabsContent>
             <TabsContent value="password">
-              <SignInEmailPasswordForm next={next} />
+              <SignUpEmailPasswordForm next={next} />
             </TabsContent>
           </Tabs>
         </div>
       </div>
       <p className="mt-4 text-center text-sm text-muted-foreground">
-        Don't have an account?{" "}
+        Alreday have an account?{" "}
         <Link
           href="/signup"
           className="font-semibold text-blue-600 hover:text-blue-500"
         >
-          Sign up
+          Sign in
         </Link>
       </p>
     </div>
