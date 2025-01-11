@@ -4,15 +4,22 @@ import { createClient } from "@/supabase/server";
 
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
+
   const next = searchParams.get("next");
   const tokenHash = searchParams.get("token_hash");
 
-  const supabase = await createClient();
+  if (tokenHash) {
+    const supabase = await createClient();
 
-  const { data, error } = await supabase.auth.verifyOtp({
-    type: "magiclink",
-    token_hash: tokenHash!,
-  });
+    const { error } = await supabase.auth.verifyOtp({
+      type: "magiclink",
+      token_hash: tokenHash,
+    });
 
-  return NextResponse.redirect(`${origin}${next}`);
+    if (!error) {
+      return NextResponse.redirect(`${origin}${next}`);
+    }
+  }
+
+  return NextResponse.redirect(`${origin}/auth/auth-code-error`);
 }
