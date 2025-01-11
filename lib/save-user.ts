@@ -1,26 +1,42 @@
-import "server-only";
-import bcrypt from "bcrypt";
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/supabase/server";
 
-export async function saveUser(email: string, password: string) {
-  const hashedPassword = await bcrypt.hash(password, 10);
+const ADMIN_EMAILS = ["rawgrittt@gmail.com"];
+
+export async function saveUser(userId: string, email: string) {
+  const supabase = await createClient();
 
   try {
-    const { error } = await supabase
-      .schema("next_auth")
+    // First check if user already exists
+    const { data: existingUser } = await supabase
       .from("users")
-      .insert({
-        email,
-        password: hashedPassword,
-        credentialsEmailVerified: false,
-      })
-      .select("*")
+      .select()
+      .eq("id", userId)
       .single();
 
-    if (error) {
-      console.error("Failed to save user:", error);
+    if (existingUser) {
+      return { user: existingUser, error: null };
     }
+
+    // If user doesn't exist, create new user
+    const role = ADMIN_EMAILS.includes(email) ? "admin" : "regular";
+
+    const { data: newUser, error } = await supabase
+      .from("users")
+      .insert([
+        {
+          id: userId,
+          email,
+          role,
+        },
+      ])
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    return { user: newUser, error: null };
   } catch (error) {
-    console.log("An unexpected error occurred while saving user: ", error);
+    console.log("saveUser error: ", error);
+    return { user: null, error };
   }
 }

@@ -19,6 +19,15 @@ export async function GET(request: NextRequest) {
     });
 
     if (!error) {
+      // Get the user data after verification
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (user) {
+        // Save user to public.users table
+        await saveUser(user.id, user.email!);
+      }
       return NextResponse.redirect(`${origin}${next}`);
     }
   }
