@@ -1,19 +1,21 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { createClient } from "@/supabase/server";
+import type { EmailOtpType } from "@supabase/supabase-js";
 
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
 
   const next = searchParams.get("next");
-  const tokenHash = searchParams.get("token_hash");
+  const type = searchParams.get("type") as EmailOtpType;
+  const token_hash = searchParams.get("token_hash");
 
-  if (tokenHash) {
+  if (token_hash && type && next) {
     const supabase = await createClient();
 
     const { error } = await supabase.auth.verifyOtp({
-      type: "magiclink",
-      token_hash: tokenHash,
+      type,
+      token_hash,
     });
 
     if (!error) {

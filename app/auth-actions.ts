@@ -1,10 +1,10 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { signInWithEmailSchema } from "@/schema";
+import { emailSchema, emailPasswordSchema } from "@/schema";
 import { parseWithZod } from "@conform-to/zod";
 import { sendEmailMagicLink } from "@/lib/send-email-magic-link";
-import { signInWithEmailAndPasswordSchema } from "@/schema";
+import { sendEmailPasswordSignUpLink } from "@/lib/send-email-password-signup-link";
 import { createClient } from "@/supabase/server";
 import { adminAuthClient } from "@/supabase/admin";
 
@@ -45,12 +45,14 @@ export async function signInWithEmail(
   formData: FormData,
 ) {
   const submission = parseWithZod(formData, {
-    schema: signInWithEmailSchema,
+    schema: emailSchema,
   });
 
   if (submission.status !== "success") {
     return submission.reply();
   }
+
+  const email = submission.value.email;
 
   let errorOccurred = false;
 
@@ -58,7 +60,7 @@ export async function signInWithEmail(
     // Generate the magic link
     const { data, error } = await adminAuthClient.generateLink({
       type: "magiclink",
-      email: submission.value.email,
+      email,
     });
 
     if (error) throw error;
@@ -68,6 +70,7 @@ export async function signInWithEmail(
       process.env.NEXT_PUBLIC_SITE_URL,
     );
     confirmUrl.searchParams.set("token_hash", data.properties.hashed_token);
+    confirmUrl.searchParams.set("type", "magiclink");
     confirmUrl.searchParams.set("next", next);
 
     await sendEmailMagicLink(submission.value.email, confirmUrl.toString());
@@ -94,7 +97,7 @@ export async function signUpWithEmailAndPassword(
   formData: FormData,
 ) {
   const submission = parseWithZod(formData, {
-    schema: signInWithEmailAndPasswordSchema,
+    schema: emailPasswordSchema,
   });
 
   if (submission.status !== "success") {
@@ -102,42 +105,32 @@ export async function signUpWithEmailAndPassword(
   }
 
   const email = submission.value.email;
-  let foundExistingAccount = false;
-  let signUpSuccessful = false;
+  const password = submission.value.password;
 
   try {
     const supabase = await createClient();
 
-    const { data } = await supabase.auth.signUp({
-      email: submission.value.email,
-      password: submission.value.password,
-      options: {
-        emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/api/auth/confirm?next=${next}`,
-      },
+    const { data, error } = await adminAuthClient.generateLink({
+      type: "signup",
+      email,
+      password,
     });
 
-    console.log("Email/password sign up Supabase response: ", data);
+    if (error) throw error;
 
-    // Check for existing account
-    if (data.user && data.user.identities?.length === 0) {
-      foundExistingAccount = true;
-    }
-
-    // Check for new sign up
-    if (data.user === null && data.session === null) {
-      signUpSuccessful = true;
-    }
+    const confirmUrl = new URL(
+      "/api/auth/confirm",
+      process.env.NEXT_PUBLIC_SITE_URL,
+    );
+    confirmUrl.searchParams.set("token_hash", data.properties.hashed_token);
+    confirmUrl.searchParams.set("type", "signup");
+    confirmUrl.searchParams.set("next", next);
   } catch (error) {
     return submission.reply({
       formErrors: ["Something went wrong. Please try again."],
     });
   } finally {
-    if (foundExistingAccount) {
-      redirect(`/signup/account-exists?email=${encodeURIComponent(email)}`);
-    }
-    if (signUpSuccessful) {
-      redirect("/signup/check-email");
-    }
+    redirect("/signup/check-email");
   }
 }
 
@@ -151,7 +144,7 @@ export async function signInWithEmailAndPassword(
   formData: FormData,
 ) {
   const submission = parseWithZod(formData, {
-    schema: signInWithEmailAndPasswordSchema,
+    schema: emailPasswordSchema,
   });
 
   if (submission.status !== "success") {

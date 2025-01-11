@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useActionState } from "react";
-import Link from "next/link";
 import { useForm } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod";
 
@@ -11,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Icons } from "@/components/icons";
 
 import { signUpWithEmailAndPassword } from "@/app/auth-actions";
-import { signInWithEmailAndPasswordSchema } from "@/schema";
+import { emailPasswordSchema } from "@/schema";
 
 export function SignUpEmailPasswordForm({ next }: { next: string }) {
   const boundSignUpWithEmailAndPassword = signUpWithEmailAndPassword.bind(
@@ -28,7 +27,7 @@ export function SignUpEmailPasswordForm({ next }: { next: string }) {
     lastResult,
     onValidate({ formData }) {
       return parseWithZod(formData, {
-        schema: signInWithEmailAndPasswordSchema,
+        schema: emailPasswordSchema,
       });
     },
   });

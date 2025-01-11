@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Icons } from "@/components/icons";
 
 import { signInWithEmailAndPassword } from "@/app/auth-actions";
-import { signInWithEmailAndPasswordSchema } from "@/schema";
+import { emailPasswordSchema } from "@/schema";
 
 export function SignInEmailPasswordForm({ next }: { next: string }) {
   const boundSignInWithEmailAndPassword = signInWithEmailAndPassword.bind(
@@ -28,7 +28,7 @@ export function SignInEmailPasswordForm({ next }: { next: string }) {
     lastResult,
     onValidate({ formData }) {
       return parseWithZod(formData, {
-        schema: signInWithEmailAndPasswordSchema,
+        schema: emailPasswordSchema,
       });
     },
   });
@@ -42,7 +42,7 @@ export function SignInEmailPasswordForm({ next }: { next: string }) {
   return (
     <form id={form.id} onSubmit={form.onSubmit} action={formAction} noValidate>
       {form.errors && (
-        <div className="p-2 text-center text-pretty text-sm text-red-600">
+        <div className="text-pretty p-2 text-center text-sm text-red-600">
           {form.errors}
         </div>
       )}

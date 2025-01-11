@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Icons } from "@/components/icons";
 
-import { signInWithEmailSchema } from "@/schema";
+import { emailSchema } from "@/schema";
 import { signInWithEmail } from "@/app/auth-actions";
 
 export function SignUpEmailForm({ next }: { next: string }) {
@@ -23,7 +23,7 @@ export function SignUpEmailForm({ next }: { next: string }) {
   const [form, fields] = useForm({
     lastResult,
     onValidate({ formData }) {
-      return parseWithZod(formData, { schema: signInWithEmailSchema });
+      return parseWithZod(formData, { schema: emailSchema });
     },
   });
   return (

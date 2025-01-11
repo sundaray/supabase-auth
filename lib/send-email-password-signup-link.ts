@@ -1,7 +1,7 @@
 import { resend } from "@/lib/resend";
 import { EmailPasswordSignUpLinkTemplate } from "@/components/email-password-signup-link-template";
 
-export async function sendEmailPassowordSignUpLink(email: string, url: string) {
+export async function sendEmailPasswordSignUpLink(email: string, url: string) {
   try {
     const { error } = await resend.emails.send({
       from: process.env.EMAIL_FROM!,

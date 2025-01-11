@@ -1,13 +1,13 @@
 import { z } from "zod";
 
-export const signInWithEmailSchema = z.object({
+export const emailSchema = z.object({
   email: z
     .string({ required_error: "Email is required" })
     .min(1, "Email is required")
     .email("Invalid email"),
 });
 
-export const signInWithEmailAndPasswordSchema = z.object({
+export const emailPasswordSchema = z.object({
   email: z
     .string({ required_error: "Email is required" })
     .min(1, "Email is required")
@@ -37,4 +37,4 @@ export const resetPasswordSchema = z
     message: "Passwords do not match.",
     // This tells Zod which field to attach the error to
     path: ["confirmNewPassword"],
-  })
+  });
