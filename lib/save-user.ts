@@ -1,8 +1,13 @@
 import { createClient } from "@/supabase/server";
+import { AuthMethodType } from "@/types";
 
 const ADMIN_EMAILS = ["rawgrittt@gmail.com"];
 
-export async function saveUser(userId: string, email: string) {
+export async function saveUser(
+  userId: string,
+  email: string,
+  type: AuthMethodType,
+) {
   const supabase = await createClient();
 
   try {
@@ -27,6 +32,7 @@ export async function saveUser(userId: string, email: string) {
           id: userId,
           email,
           role,
+          providers: [type],
         },
       ])
       .select()
