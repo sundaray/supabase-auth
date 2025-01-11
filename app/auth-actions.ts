@@ -108,8 +108,20 @@ export async function signUpWithEmailAndPassword(
   const password = submission.value.password;
 
   try {
-    const supabase = await createClient();
+    // Check if user already exists
+    const { exists, error: checkError } = await checkUserExists(email);
 
+    if (checkError) {
+      throw checkError;
+    }
+
+    if (exists) {
+      return submission.reply({
+        formErrors: ["An account with this email already exists."],
+      });
+    }
+
+    // If user doesn't exist, proceed with signup
     const { data, error } = await adminAuthClient.generateLink({
       type: "signup",
       email,
@@ -118,6 +130,7 @@ export async function signUpWithEmailAndPassword(
 
     if (error) throw error;
 
+    // Create confirmation URL
     const confirmUrl = new URL(
       "/api/auth/confirm",
       process.env.NEXT_PUBLIC_SITE_URL,
@@ -125,6 +138,9 @@ export async function signUpWithEmailAndPassword(
     confirmUrl.searchParams.set("token_hash", data.properties.hashed_token);
     confirmUrl.searchParams.set("type", "signup");
     confirmUrl.searchParams.set("next", next);
+
+    // Send email with confirmation link
+    await sendEmailPasswordSignUpLink(email, confirmUrl.toString());
   } catch (error) {
     return submission.reply({
       formErrors: ["Something went wrong. Please try again."],

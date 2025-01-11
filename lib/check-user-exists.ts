@@ -1,23 +1,29 @@
 import "server-only";
-
-import { supabase } from "@/lib/supabase";
+import { createClient } from "@/supabase/server";
 
 export async function checkUserExists(email: string) {
+  const supabase = await createClient();
+
   try {
-    const { data, error } = await supabase
-      .schema("next_auth")
+    const { error } = await supabase
       .from("users")
-      .select("id, email, password, credentialsEmailVerified, role")
+      .select("*")
       .eq("email", email)
       .single();
 
     if (error) {
-      console.log("Failed to check user existence:", error.message);
+      throw error;
     }
 
-    return data;
+    return {
+      exists: true,
+      error: null,
+    };
   } catch (error) {
-    console.error("Unexpected error while checking user existence:", error);
-    return null;
+    console.log("checkUserExists error: ", error);
+    return {
+      exists: false,
+      error,
+    };
   }
 }
