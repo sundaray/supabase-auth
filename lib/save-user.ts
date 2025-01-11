@@ -10,38 +10,67 @@ export async function saveUser(
   const supabase = await createClient();
 
   try {
-    // First check if user already exists
-    const { data: existingUser } = await supabase
+    // Step 1: Check if a user with the given email exists
+    const { data: existingUser, error: findError } = await supabase
       .from("users")
-      .select()
-      .eq("id", userId)
+      .select("*")
+      .eq("email", email)
       .single();
 
-    if (existingUser) {
-      return { user: existingUser, error: null };
+    if (findError) {
+      // User not found, create a new user
+      const role = ADMIN_EMAILS.includes(email) ? "admin" : "user";
+
+      const { data: newUser, error: insertError } = await supabase
+        .from("users")
+        .insert([
+          {
+            id: userId,
+            email,
+            role,
+          },
+        ])
+        .select()
+        .single();
+
+      if (insertError) throw insertError;
+
+      // Add `type` to the `providers` array for the new user
+      const { error: rpcError } = await supabase.rpc("add_provider", {
+        user_id: newUser.id,
+        provider: type,
+      });
+
+      if (rpcError) throw rpcError;
+
+      return { user: newUser, error: null };
     }
 
-    // If user doesn't exist, create new user
-    const role = ADMIN_EMAILS.includes(email) ? "admin" : "regular";
+    if (existingUser) {
+      // Check if the `type` is already in the `providers` array
+      const { data: providerCheck, error: providerError } = await supabase
+        .from("users")
+        .select("providers")
+        .eq("id", existingUser.id)
+        .contains("providers", [type]); // Check if `type` exists in `providers`
 
-    const { data: newUser, error } = await supabase
-      .from("users")
-      .insert([
-        {
-          id: userId,
-          email,
-          role,
-          providers: [type],
-        },
-      ])
-      .select()
-      .single();
+      if (providerError) throw providerError;
 
-    if (error) throw error;
+      if (providerCheck.length > 0) {
+        // If the `type` already exists, do nothing
+        return { user: existingUser, error: null };
+      }
 
-    console.log("New user created: ", newUser);
+      // `type` doesn't exist, so append it to the `providers` array
+      const { error: rpcError } = await supabase.rpc("add_provider", {
+        user_id: existingUser.id,
+        provider: type,
+      });
 
-    return { user: newUser, error: null };
+      if (rpcError) throw rpcError;
+
+      return { user: existingUser, error: null };
+    }
   } catch (error) {
     console.log("saveUser error: ", error);
     return { user: null, error };

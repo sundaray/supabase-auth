@@ -9,7 +9,7 @@ export default function ClientPage() {
 
   if (status === "loading") {
     return (
-      <div className="mx-auto mt-12 flex w-fit items-center gap-2 text-center">
+      <div className="mx-auto flex w-fit items-center gap-2 text-center">
         <Icons.loader className="inline-block size-3.5 animate-spin" />
         <p className="text-gray-700">Loading...</p>
       </div>
@@ -18,7 +18,7 @@ export default function ClientPage() {
 
   if (status === "unauthenticated") {
     return (
-      <div className="mt-12 text-center">
+      <div className="text-center">
         <h1 className="text-xl font-medium text-red-600">
           User Not Authenticated
         </h1>
@@ -32,7 +32,7 @@ export default function ClientPage() {
   }
 
   return (
-    <div className="mt-12 text-center">
+    <div className="text-center">
       <h1 className="text-xl font-medium text-green-600">User Authenticated</h1>
       <p className="mt-4 text-sm">User email: {session?.user?.email}</p>
       <p className="text-sm">
