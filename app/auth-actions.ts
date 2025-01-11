@@ -53,6 +53,7 @@ export async function signInWithEmail(
   }
 
   let errorOccurred = false;
+
   try {
     // Generate the magic link
     const { data, error } = await adminAuthClient.generateLink({
@@ -69,18 +70,12 @@ export async function signInWithEmail(
       "/api/auth/confirm",
       process.env.NEXT_PUBLIC_SITE_URL,
     );
-
     confirmUrl.searchParams.set("token_hash", data.properties.hashed_token);
     confirmUrl.searchParams.set("next", next);
 
-    // The magic link is available in data.properties.action_link
-    await sendEmailSignInLink(
-      submission.value.email,
-      confirmUrl.toString(),
-      // data.properties.action_link,
-    );
+    await sendEmailSignInLink(submission.value.email, confirmUrl.toString());
   } catch (error) {
-    console.log("Error generate link: ", error);
+    console.log("Failed to send Email magic link: ", error);
     errorOccurred = true;
     return submission.reply({
       formErrors: ["Something went wrong. Please try again."],
@@ -91,41 +86,6 @@ export async function signInWithEmail(
     }
   }
 }
-
-// export async function signInWithEmail(
-//   next: string,
-//   prevState: unknown,
-//   formData: FormData,
-// ) {
-//   const submission = parseWithZod(formData, {
-//     schema: signInWithEmailSchema,
-//   });
-
-//   if (submission.status !== "success") {
-//     return submission.reply();
-//   }
-
-//   let errorOccurred = false;
-//   try {
-//     const supabase = await createClient();
-
-//     await supabase.auth.signInWithOtp({
-//       email: submission.value.email,
-//       options: {
-//         emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/api/auth/confirm?next=${next}`,
-//       },
-//     });
-//   } catch (error) {
-//     errorOccurred = true;
-//     return submission.reply({
-//       formErrors: ["Something went wrong. Please try again."],
-//     });
-//   } finally {
-//     if (!errorOccurred) {
-//       redirect("/signin/check-email");
-//     }
-//   }
-// }
 
 /************************************************
  * Sign Up With Email and Password
