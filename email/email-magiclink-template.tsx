@@ -5,7 +5,7 @@ import { Html } from "@react-email/html";
 import { Tailwind } from "@react-email/tailwind";
 import { Text } from "@react-email/text";
 
-export function EmailSignInTemplate({ url }: { url: string }) {
+export function EmailMagicLinkTemplate({ url }: { url: string }) {
   return (
     <Html>
       <Tailwind>

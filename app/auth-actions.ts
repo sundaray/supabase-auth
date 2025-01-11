@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import { signInWithEmailSchema } from "@/schema";
 import { parseWithZod } from "@conform-to/zod";
-import { sendEmailSignInLink } from "@/lib/send-email-signin-link";
+import { sendEmailMagicLink } from "@/lib/send-email-magic-link";
 import { signInWithEmailAndPasswordSchema } from "@/schema";
 import { createClient } from "@/supabase/server";
 import { adminAuthClient } from "@/supabase/admin";
@@ -59,9 +59,6 @@ export async function signInWithEmail(
     const { data, error } = await adminAuthClient.generateLink({
       type: "magiclink",
       email: submission.value.email,
-      options: {
-        redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/api/auth/confirm?next=${next}`,
-      },
     });
 
     if (error) throw error;
@@ -73,7 +70,7 @@ export async function signInWithEmail(
     confirmUrl.searchParams.set("token_hash", data.properties.hashed_token);
     confirmUrl.searchParams.set("next", next);
 
-    await sendEmailSignInLink(submission.value.email, confirmUrl.toString());
+    await sendEmailMagicLink(submission.value.email, confirmUrl.toString());
   } catch (error) {
     console.log("Failed to send Email magic link: ", error);
     errorOccurred = true;

@@ -47,6 +47,7 @@ export function SignInEmailForm({ next }: { next: string }) {
           id="email"
           type="email"
           name="email"
+          defaultValue={lastResult?.initialValue?.email as string}
           placeholder="you@example.com"
         />
         <div className="text-sm text-red-600">{fields.email.errors}</div>

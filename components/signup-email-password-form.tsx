@@ -65,14 +65,6 @@ export function SignUpEmailPasswordForm({ next }: { next: string }) {
             <Label htmlFor="password" className="text-gray-700">
               Password
             </Label>
-            <div className="text-sm">
-              <Link
-                href="/forgot-password"
-                className="font-medium text-blue-600 hover:text-blue-500"
-              >
-                Forgot password?
-              </Link>
-            </div>
           </div>
           <div className="relative">
             <Input

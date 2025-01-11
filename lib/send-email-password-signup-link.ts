@@ -1,18 +1,13 @@
 import { resend } from "@/lib/resend";
-import { EmailVerificationTemplate } from "@/components/email-verification-template";
+import { EmailPasswordSignUpLinkTemplate } from "@/components/email-password-signup-link-template";
 
-export async function sendVerificationEmail(email: string, token: string) {
-  const url = new URL(
-    `/api/auth/verify-credentials-email?token=${token}&email=${encodeURIComponent(email)}`,
-    process.env.AUTH_URL,
-  );
-
+export async function sendEmailPassowordSignUpLink(email: string, url: string) {
   try {
     const { error } = await resend.emails.send({
       from: process.env.EMAIL_FROM!,
       to: email,
       subject: "Sign in to your account",
-      react: EmailVerificationTemplate({ url: url.toString() }),
+      react: EmailPasswordSignUpLinkTemplate({ url }),
     });
 
     if (error) {
