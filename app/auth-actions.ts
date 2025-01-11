@@ -1,10 +1,12 @@
 "use server";
 
-import { createClient } from "@/supabase/server";
 import { redirect } from "next/navigation";
 import { signInWithEmailSchema } from "@/schema";
 import { parseWithZod } from "@conform-to/zod";
+import { sendEmailSignInLink } from "@/lib/send-email-signin-link";
 import { signInWithEmailAndPasswordSchema } from "@/schema";
+import { createClient } from "@/supabase/server";
+import { adminAuthClient } from "@/supabase/admin";
 
 /************************************************
  * Sign In With Google
@@ -52,28 +54,36 @@ export async function signInWithEmail(
 
   let errorOccurred = false;
   try {
-    const supabase = await createClient();
-
-    const { error } = await supabase.auth.signInWithOtp({
+    // Generate the magic link
+    const { data, error } = await adminAuthClient.generateLink({
+      type: "magiclink",
       email: submission.value.email,
       options: {
-        emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/api/auth/confirm?next=${next}`,
+        redirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/api/auth/confirm?next=${next}`,
       },
     });
 
-    if (error) {
-      return submission.reply({
-        formErrors: [error.message],
-      });
-    }
+    if (error) throw error;
 
-    return submission.reply({
-      formErrors: ["Check your email for the login link!"],
-    });
+    const confirmUrl = new URL(
+      "/api/auth/confirm",
+      process.env.NEXT_PUBLIC_SITE_URL,
+    );
+
+    confirmUrl.searchParams.set("token_hash", data.properties.hashed_token);
+    confirmUrl.searchParams.set("next", next);
+
+    // The magic link is available in data.properties.action_link
+    await sendEmailSignInLink(
+      submission.value.email,
+      confirmUrl.toString(),
+      // data.properties.action_link,
+    );
   } catch (error) {
+    console.log("Error generate link: ", error);
     errorOccurred = true;
     return submission.reply({
-      formErrors: ["An unexpected error occurred."],
+      formErrors: ["Something went wrong. Please try again."],
     });
   } finally {
     if (!errorOccurred) {
@@ -81,6 +91,41 @@ export async function signInWithEmail(
     }
   }
 }
+
+// export async function signInWithEmail(
+//   next: string,
+//   prevState: unknown,
+//   formData: FormData,
+// ) {
+//   const submission = parseWithZod(formData, {
+//     schema: signInWithEmailSchema,
+//   });
+
+//   if (submission.status !== "success") {
+//     return submission.reply();
+//   }
+
+//   let errorOccurred = false;
+//   try {
+//     const supabase = await createClient();
+
+//     await supabase.auth.signInWithOtp({
+//       email: submission.value.email,
+//       options: {
+//         emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL}/api/auth/confirm?next=${next}`,
+//       },
+//     });
+//   } catch (error) {
+//     errorOccurred = true;
+//     return submission.reply({
+//       formErrors: ["Something went wrong. Please try again."],
+//     });
+//   } finally {
+//     if (!errorOccurred) {
+//       redirect("/signin/check-email");
+//     }
+//   }
+// }
 
 /************************************************
  * Sign Up With Email and Password
@@ -99,10 +144,14 @@ export async function signUpWithEmailAndPassword(
     return submission.reply();
   }
 
+  const email = submission.value.email;
+  let foundExistingAccount = false;
+  let signUpSuccessful = false;
+
   try {
     const supabase = await createClient();
 
-    const { data, error } = await supabase.auth.signUp({
+    const { data } = await supabase.auth.signUp({
       email: submission.value.email,
       password: submission.value.password,
       options: {
@@ -110,24 +159,28 @@ export async function signUpWithEmailAndPassword(
       },
     });
 
-    console.log("Signup response:", { data, error });
+    console.log("Email/password sign up Supabase response: ", data);
 
-    if (error) {
-      return submission.reply({
-        formErrors: [error.message],
-      });
+    // Check for existing account
+    if (data.user && data.user.identities?.length === 0) {
+      foundExistingAccount = true;
     }
 
-    // Log the user object to see what we got back
-    console.log("User data:", data?.user);
-
-    return submission.reply({
-      formErrors: ["Check your email for email confirmation"],
-    });
+    // Check for new sign up
+    if (data.user === null && data.session === null) {
+      signUpSuccessful = true;
+    }
   } catch (error) {
     return submission.reply({
-      formErrors: ["An unexpected error occurred."],
+      formErrors: ["Something went wrong. Please try again."],
     });
+  } finally {
+    if (foundExistingAccount) {
+      redirect(`/signup/account-exists?email=${encodeURIComponent(email)}`);
+    }
+    if (signUpSuccessful) {
+      redirect("/signup/check-email");
+    }
   }
 }
 

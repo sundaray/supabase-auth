@@ -1,28 +1,22 @@
-import { createClient } from "@/supabase/server";
 import { NextResponse } from "next/server";
-import { type EmailOtpType } from "@supabase/supabase-js";
+import type { NextRequest } from "next/server";
+import { createClient } from "@/supabase/server";
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
+  console.log("Request URL auth/confirm route handler: ", request.url);
   const { searchParams, origin } = new URL(request.url);
-  const token_hash = searchParams.get("token_hash");
-  const type = searchParams.get("type") as EmailOtpType | null;
-  const redirectToUrl = searchParams.get("redirectToUrl")!;
-  const next = new URL(redirectToUrl).searchParams.get("next") ?? "/";
+  const next = searchParams.get("next");
+  const tokenHash = searchParams.get("token_hash");
 
-  if (token_hash && type) {
-    const supabase = await createClient();
+  console.log("Token hash: ", tokenHash);
+  console.log("Next: ", next);
 
-    const { error } = await supabase.auth.verifyOtp({
-      token_hash,
-      type,
-    });
+  const supabase = await createClient();
 
-    if (!error) {
-      // Successful verification - redirect to the original destination
-      return NextResponse.redirect(`${origin}${next}`);
-    }
-  }
+  const { data, error } = await supabase.auth.verifyOtp({
+    type: "magiclink",
+    token_hash: tokenHash!,
+  });
 
-  // Handle errors by redirecting to error page
-  return NextResponse.redirect(`${origin}/auth/auth-code-error`);
+  return NextResponse.redirect(`${origin}${next}`);
 }

@@ -18,6 +18,8 @@ export async function UserAccountNav() {
     data: { user },
   } = await supabase.auth.getUser();
 
+  // console.log("User inside user account nav: ", user);
+
   if (!user) {
     return (
       <Link
@@ -30,8 +32,6 @@ export async function UserAccountNav() {
       </Link>
     );
   }
-
-  console.log("User in server component: ", user);
 
   return (
     <DropdownMenu>

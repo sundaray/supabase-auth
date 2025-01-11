@@ -10,11 +10,7 @@ export async function GET(request: Request) {
   const code = searchParams.get("code");
   const next = searchParams.get("next") ?? "/";
 
-  console.log(
-    "Inside Google callback route handler, SearchParams:",
-    searchParams,
-  );
-  console.log("Inside Google callback route handler, Next query param:", next);
+  console.log("Code inside google route handler: ", code);
 
   if (code) {
     // Create a Supabase client
@@ -22,6 +18,10 @@ export async function GET(request: Request) {
 
     // Exchange the code for a session
     const { error } = await supabase.auth.exchangeCodeForSession(code);
+
+    if (error) {
+      console.log("Google route handler error: ", error);
+    }
 
     if (!error) {
       return NextResponse.redirect(`${origin}${next}`);
