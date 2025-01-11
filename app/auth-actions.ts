@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { emailSchema, emailPasswordSchema } from "@/schema";
 import { parseWithZod } from "@conform-to/zod";
+import { checkUserExists } from "@/lib/check-user-exists";
 import { sendEmailMagicLink } from "@/lib/send-email-magic-link";
 import { sendEmailPasswordSignUpLink } from "@/lib/send-email-password-signup-link";
 import { createClient } from "@/supabase/server";
@@ -104,6 +105,7 @@ export async function signUpWithEmailAndPassword(
     return submission.reply();
   }
 
+  let signupSuccessful = false;
   const email = submission.value.email;
   const password = submission.value.password;
 
@@ -141,12 +143,16 @@ export async function signUpWithEmailAndPassword(
 
     // Send email with confirmation link
     await sendEmailPasswordSignUpLink(email, confirmUrl.toString());
+
+    signupSuccessful = true;
   } catch (error) {
     return submission.reply({
       formErrors: ["Something went wrong. Please try again."],
     });
   } finally {
-    redirect("/signup/check-email");
+    if (signupSuccessful) {
+      redirect("/signup/check-email");
+    }
   }
 }
 
