@@ -5,9 +5,9 @@ export async function checkUserExists(email: string) {
   const supabase = await createClient();
 
   try {
-    const { error } = await supabase
+    const { data: user, error } = await supabase
       .from("users")
-      .select("*")
+      .select("email, providers")
       .eq("email", email)
       .single();
 
@@ -15,14 +15,19 @@ export async function checkUserExists(email: string) {
       throw error;
     }
 
+    // Check if the user has signed up with credentials
+    const hasCredentials = user?.providers?.includes("credentials") ?? false;
+
     return {
       exists: true,
+      hasCredentials,
       error: null,
     };
   } catch (error) {
     console.log("checkUserExists error: ", error);
     return {
       exists: false,
+      hasCredentials: false,
       error,
     };
   }

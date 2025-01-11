@@ -1,12 +1,11 @@
 import { createClient } from "@/supabase/server";
-import { AuthMethodType } from "@/types";
 
 const ADMIN_EMAILS = ["rawgrittt@gmail.com"];
 
 export async function saveUser(
   userId: string,
   email: string,
-  type: AuthMethodType,
+  type: "magiclink" | "signup" | "google",
 ) {
   const supabase = await createClient();
 
@@ -39,6 +38,8 @@ export async function saveUser(
       .single();
 
     if (error) throw error;
+
+    console.log("New user created: ", newUser);
 
     return { user: newUser, error: null };
   } catch (error) {

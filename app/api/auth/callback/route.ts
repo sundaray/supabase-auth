@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/supabase/server";
+import { saveUser } from "@/lib/save-user";
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
@@ -13,6 +14,16 @@ export async function GET(request: Request) {
     const { error } = await supabase.auth.exchangeCodeForSession(code);
 
     if (!error) {
+      // Get the user data after verification
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (user) {
+        // Save user to public.users table
+        await saveUser(user.id, user.email!, "google");
+      }
+
       return NextResponse.redirect(`${origin}${next}`);
     }
   }

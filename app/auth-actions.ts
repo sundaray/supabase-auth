@@ -111,19 +111,26 @@ export async function signUpWithEmailAndPassword(
 
   try {
     // Check if user already exists
-    const { exists, error: checkError } = await checkUserExists(email);
+    const {
+      exists,
+      hasCredentials,
+      error: checkError,
+    } = await checkUserExists(email);
 
     if (checkError) {
       throw checkError;
     }
 
-    if (exists) {
+    if (exists && hasCredentials) {
       return submission.reply({
         formErrors: ["An account with this email already exists."],
       });
     }
 
-    // If user doesn't exist, proceed with signup
+    // At this point, either:
+    // 1. User doesn't exist at all (first time signup)
+    // 2. User exists but hasn't used credentials (signed up via magic link/Google)
+    // In both cases, we want to send the signup link
     const { data, error } = await adminAuthClient.generateLink({
       type: "signup",
       email,
