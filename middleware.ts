@@ -7,5 +7,5 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin", "/private"],
+  matcher: ["/admin", "/private", "/forgot-passowrd"],
 };

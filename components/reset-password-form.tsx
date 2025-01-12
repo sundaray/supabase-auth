@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useActionState } from "react";
-import { useSearchParams } from "next/navigation";
 import { parseWithZod } from "@conform-to/zod";
 
 import { Label } from "@/components/ui/label";
@@ -15,11 +14,6 @@ import { resetUserPassword } from "@/app/password-reset-actions";
 import { resetPasswordSchema } from "@/schema";
 
 export function ResetPasswordForm() {
-  const searchParams = useSearchParams();
-  const token = searchParams.get("token");
-  const email = searchParams.get("email");
-
-  // Bind the token and email to the action
   const [lastResult, formAction, isPending] = useActionState(
     resetUserPassword,
     undefined,

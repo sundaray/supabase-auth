@@ -155,8 +155,7 @@ export async function signUpWithEmailAndPassword(
       existingUserSignUpSuccessful = true;
     }
 
-    // At this point,
-    // 1. User doesn't exist at all (first time signup)
+    // At this point, user doesn't exist at all (first time signup)
     const { data, error } = await adminAuthClient.generateLink({
       type: "signup",
       email,
@@ -229,7 +228,6 @@ export async function signInWithEmailAndPassword(
           formErrors: ["The email or password you entered is incorrect."],
         });
       }
-
     }
   } catch (error) {
     errorOccurred = true;

@@ -46,7 +46,13 @@ export async function updateSession(request: NextRequest) {
   }
 
   // Redirect authenticated users attempting to access the sign-in page to the home page
-  if (user && path === "/signin") {
+  if (
+    user &&
+    (path === "/signin" ||
+      path === "/signup" ||
+      path === "/forgot-password" ||
+      path === "/reset-password")
+  ) {
     return NextResponse.redirect(new URL("/", nextUrl));
   }
 

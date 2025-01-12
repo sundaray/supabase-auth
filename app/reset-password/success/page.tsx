@@ -3,17 +3,19 @@ import { Icons } from "@/components/icons";
 
 export default function ResetPasswordSuccessPage() {
   return (
-    <div className="mx-auto mt-12 max-w-sm px-4 text-center lg:px-8">
-      <h2 className="text-xl font-bold text-green-600">Password Reset</h2>
-      <p className="my-4 text-gray-700">
-        Your password has been reset successfully.
+    <div className="container mx-auto max-w-md text-center">
+      <h1 className="mb-4 mb-6 text-lg font-bold text-green-600">
+        Password Reset Successful
+      </h1>
+      <p className="mb-2 text-sm leading-relaxed text-muted-foreground">
+        Your password has been updated successfully
       </p>
       <Link
         href="/signin"
-        className="group flex items-center justify-center p-2 text-blue-600"
+        className="inline-flex items-center gap-1 text-sm font-semibold text-blue-500 hover:text-blue-600"
       >
-        <Icons.arrowLeft className="mr-2 inline-block size-4 transform text-muted-foreground transition-transform group-hover:-translate-x-1 group-hover:text-blue-600" />
-        Sign in
+        Sign in to your account
+        <Icons.arrowRight className="size-4" />
       </Link>
     </div>
   );
