@@ -6,7 +6,7 @@ export async function sendEmailPasswordSignUpLink(email: string, url: string) {
     const { error } = await resend.emails.send({
       from: process.env.EMAIL_FROM!,
       to: email,
-      subject: "Sign in to your account",
+      subject: "Sign up to create an account",
       react: EmailPasswordSignUpLinkTemplate({ url }),
     });
 

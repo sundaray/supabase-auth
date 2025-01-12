@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useActionState } from "react";
 import { useSearchParams } from "next/navigation";
 import { parseWithZod } from "@conform-to/zod";
@@ -19,9 +20,8 @@ export function ResetPasswordForm() {
   const email = searchParams.get("email");
 
   // Bind the token and email to the action
-  const boundResetPassword = resetUserPassword.bind(null, token!, email!);
   const [lastResult, formAction, isPending] = useActionState(
-    boundResetPassword,
+    resetUserPassword,
     undefined,
   );
 
@@ -32,8 +32,11 @@ export function ResetPasswordForm() {
     },
   });
   return (
-    <div className="mx-auto mt-16 px-4 sm:max-w-sm">
-      <h1 className="text-center text-2xl font-bold">Reset Password</h1>
+    <div className="mx-auto px-4 sm:max-w-sm">
+      <h1 className="text-2xl font-semibold">Reset Your Password</h1>
+      <p className="mt-2 text-sm text-muted-foreground">
+        Type in a new secure password and press save to update your password
+      </p>
       <form
         className="mt-12"
         id={form.id}
@@ -77,14 +80,23 @@ export function ResetPasswordForm() {
             {isPending ? (
               <>
                 <Icons.loader className="size-3 animate-spin" />
-                Resetting...
+                Saving...
               </>
             ) : (
-              "Reset password"
+              "Save New Password"
             )}
           </Button>
         </div>
       </form>
+      <p className="mt-4 text-center text-sm text-muted-foreground">
+        Have an account?{" "}
+        <Link
+          href="/signin"
+          className="font-semibold text-blue-600 hover:text-blue-500"
+        >
+          Sign in
+        </Link>
+      </p>
     </div>
   );
 }

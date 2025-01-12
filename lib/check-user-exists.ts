@@ -7,27 +7,25 @@ export async function checkUserExists(email: string) {
   try {
     const { data: user, error } = await supabase
       .from("users")
-      .select("email, providers")
+      .select("id, email, providers")
       .eq("email", email)
       .single();
 
-    if (error) {
-      throw error;
-    }
-
-    // Check if the user has signed up with credentials
-    const hasCredentials = user?.providers?.includes("credentials") ?? false;
+    // Check if the user has signed up with email/password
+    const hasSignedUp = user?.providers?.includes("signup") ?? false;
 
     return {
       exists: true,
-      hasCredentials,
+      id: user?.id,
+      hasSignedUp,
       error: null,
     };
   } catch (error) {
     console.log("checkUserExists error: ", error);
     return {
       exists: false,
-      hasCredentials: false,
+      id: false,
+      hasSignedUp: false,
       error,
     };
   }

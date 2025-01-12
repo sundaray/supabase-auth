@@ -105,7 +105,8 @@ export async function signUpWithEmailAndPassword(
     return submission.reply();
   }
 
-  let signupSuccessful = false;
+  let existingUserSignUpSuccessful = false;
+  let newUserSignUpSuccessful = false;
   const email = submission.value.email;
   const password = submission.value.password;
 
@@ -113,7 +114,8 @@ export async function signUpWithEmailAndPassword(
     // Check if user already exists
     const {
       exists,
-      hasCredentials,
+      id,
+      hasSignedUp,
       error: checkError,
     } = await checkUserExists(email);
 
@@ -121,16 +123,40 @@ export async function signUpWithEmailAndPassword(
       throw checkError;
     }
 
-    if (exists && hasCredentials) {
+    if (exists && hasSignedUp) {
       return submission.reply({
         formErrors: ["An account with this email already exists."],
       });
     }
 
-    // At this point, either:
+    if (exists && !hasSignedUp && id) {
+      const supabase = await createClient();
+
+      // Update the user's password
+      const { data: updatedUser, error: updateError } =
+        await adminAuthClient.updateUserById(id, {
+          password,
+        });
+
+      if (updateError) {
+        throw updateError;
+      }
+
+      // Append "signup" to the `providers` array
+      const { error: rpcError } = await supabase.rpc("add_provider", {
+        user_id: id,
+        provider: "signup",
+      });
+
+      if (rpcError) {
+        throw rpcError;
+      }
+
+      existingUserSignUpSuccessful = true;
+    }
+
+    // At this point,
     // 1. User doesn't exist at all (first time signup)
-    // 2. User exists but hasn't used credentials (signed up via magic link/Google)
-    // In both cases, we want to send the signup link
     const { data, error } = await adminAuthClient.generateLink({
       type: "signup",
       email,
@@ -151,14 +177,18 @@ export async function signUpWithEmailAndPassword(
     // Send email with confirmation link
     await sendEmailPasswordSignUpLink(email, confirmUrl.toString());
 
-    signupSuccessful = true;
+    newUserSignUpSuccessful = true;
   } catch (error) {
+    console.log("Email/password sign up error: ", error);
     return submission.reply({
       formErrors: ["Something went wrong. Please try again."],
     });
   } finally {
-    if (signupSuccessful) {
+    if (newUserSignUpSuccessful) {
       redirect("/signup/check-email");
+    }
+    if (existingUserSignUpSuccessful) {
+      redirect("/signin");
     }
   }
 }
@@ -190,9 +220,6 @@ export async function signInWithEmailAndPassword(
       password: submission.value.password,
     });
 
-    console.log("Email/password sign in data: ", data);
-    console.log("Email/password sign in error: ", error);
-
     if (error) {
       errorOccurred = true;
 
@@ -203,10 +230,6 @@ export async function signInWithEmailAndPassword(
         });
       }
 
-      // Handle any other Supabase auth errors
-      return submission.reply({
-        formErrors: ["Something went wrong. Please try again."],
-      });
     }
   } catch (error) {
     errorOccurred = true;

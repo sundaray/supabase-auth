@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import Link from "next/link";
 import { useForm } from "@conform-to/react";
 import { parseWithZod } from "@conform-to/zod";
 
@@ -10,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Icons } from "@/components/icons";
 
 import { requestPasswordReset } from "@/app/password-reset-actions";
-import { forgotPasswordSchema } from "@/schema";
+import { emailSchema } from "@/schema";
 
 export function ForgotPasswordForm() {
   const [lastResult, formAction, isPending] = useActionState(
@@ -21,14 +22,17 @@ export function ForgotPasswordForm() {
   const [form, fields] = useForm({
     lastResult,
     onValidate({ formData }) {
-      return parseWithZod(formData, { schema: forgotPasswordSchema });
+      return parseWithZod(formData, { schema: emailSchema });
     },
   });
   return (
-    <div className="mx-auto mt-16 px-4 sm:mx-auto sm:max-w-sm">
-      <h2 className="text-center text-2xl font-bold tracking-tight text-primary">
-        Forgot Password
+    <div className="px-4 sm:mx-auto sm:max-w-sm">
+      <h2 className="text-2xl font-semibold tracking-tight text-primary">
+        Reset Your Password
       </h2>
+      <p className="mt-2 text-pretty text-sm text-muted-foreground">
+        Type in your email and we'll send you a link to reset your password
+      </p>
       <form
         className="mt-12"
         id={form.id}
@@ -60,14 +64,23 @@ export function ForgotPasswordForm() {
             {isPending ? (
               <>
                 <Icons.loader className="size-3 animate-spin" />
-                Sending link...
+                Sending...
               </>
             ) : (
-              "Send password reset link"
+              "Send Reset Email"
             )}
           </Button>
         </div>
       </form>
+      <p className="mt-4 text-center text-sm text-muted-foreground">
+        Have an account?{" "}
+        <Link
+          href="/signin"
+          className="font-semibold text-blue-600 hover:text-blue-500"
+        >
+          Sign in
+        </Link>
+      </p>
     </div>
   );
 }

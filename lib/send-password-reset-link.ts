@@ -1,20 +1,15 @@
 import "server-only";
 import { resend } from "@/lib/resend";
-import { PasswordResetTemplate } from "@/components/password-reset-email-template";
+import { PasswordResetLinkTemplate } from "@/components/password-reset-link-template";
 import { PasswordResetError } from "@/lib/password-reset-error";
 
-export async function sendPasswordResetEmail(email: string, token: string) {
-  const url = new URL(
-    `/api/auth/verify-password-reset-token?token=${token}&email=${encodeURIComponent(email)}`,
-    process.env.AUTH_URL,
-  );
-
+export async function sendPasswordResetLink(email: string, url: string) {
   try {
     const { error } = await resend.emails.send({
       from: process.env.EMAIL_FROM!,
       to: email,
       subject: "Reset your password",
-      react: PasswordResetTemplate({ url: url.toString() }),
+      react: PasswordResetLinkTemplate({ url }),
     });
 
     if (error) {

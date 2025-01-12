@@ -1,3 +1,6 @@
 import type { EmailOtpType } from "@supabase/supabase-js";
 
-export type AuthMethodType = Extract<EmailOtpType, "signup" | "magiclink">;
+export type AuthMethodType = Extract<
+  EmailOtpType,
+  "signup" | "magiclink" | "recovery"
+>;

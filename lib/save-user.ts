@@ -5,7 +5,7 @@ const ADMIN_EMAILS = ["rawgrittt@gmail.com"];
 export async function saveUser(
   userId: string,
   email: string,
-  type: "magiclink" | "signup" | "google",
+  type: "magiclink" | "signup" | "google" | "recovery",
 ) {
   const supabase = await createClient();
 

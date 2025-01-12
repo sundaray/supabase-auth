@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
       token_hash,
     });
 
-    if (!error) {
+    if (!error && type !== "recovery") {
       // Get the user data after verification
       const {
         data: { user },
@@ -29,6 +29,10 @@ export async function GET(request: NextRequest) {
         // Save user to public.users table
         await saveUser(user.id, user.email!, type);
       }
+      return NextResponse.redirect(`${origin}${next}`);
+    }
+
+    if (!error && type === "recovery") {
       return NextResponse.redirect(`${origin}${next}`);
     }
   }
