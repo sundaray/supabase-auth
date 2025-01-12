@@ -95,7 +95,7 @@ export function SignUpEmailPasswordForm({ next }: { next: string }) {
               Signing up...
             </>
           ) : (
-            "Sign up"
+            "Sign Up"
           )}
         </Button>
       </div>

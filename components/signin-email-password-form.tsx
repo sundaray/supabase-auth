@@ -104,7 +104,7 @@ export function SignInEmailPasswordForm({ next }: { next: string }) {
               Signing in...
             </>
           ) : (
-            "Sign in"
+            "Sign In"
           )}
         </Button>
       </div>

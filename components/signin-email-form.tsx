@@ -59,7 +59,7 @@ export function SignInEmailForm({ next }: { next: string }) {
             Signing in...
           </>
         ) : (
-          "Sign in"
+          "Sign In"
         )}
       </Button>
     </form>

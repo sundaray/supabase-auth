@@ -27,18 +27,17 @@ export function ResetPasswordForm() {
   });
   return (
     <div className="mx-auto px-4 sm:max-w-sm">
-      <h1 className="text-2xl font-semibold">Reset Your Password</h1>
+      <h1 className="text-2xl font-semibold">Reset your password</h1>
       <p className="mt-2 text-sm text-muted-foreground">
         Type in a new secure password and press save to update your password
       </p>
       <form
-        className="mt-12"
         id={form.id}
         onSubmit={form.onSubmit}
         action={formAction}
         noValidate
       >
-        <div className="grid gap-4">
+        <div className="mt-12 grid gap-4">
           {form.errors && (
             <div className="rounded border border-red-200 bg-red-50 p-2 text-center text-sm text-red-600">
               {form.errors}

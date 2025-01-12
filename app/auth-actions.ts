@@ -58,7 +58,6 @@ export async function signInWithEmail(
   let errorOccurred = false;
 
   try {
-    // Generate the magic link
     const { data, error } = await adminAuthClient.generateLink({
       type: "magiclink",
       email,
@@ -67,7 +66,7 @@ export async function signInWithEmail(
     if (error) throw error;
 
     const confirmUrl = new URL(
-      "/api/auth/confirm",
+      "/api/auth/confirm-magiclink",
       process.env.NEXT_PUBLIC_SITE_URL,
     );
     confirmUrl.searchParams.set("token_hash", data.properties.hashed_token);
@@ -166,7 +165,7 @@ export async function signUpWithEmailAndPassword(
 
     // Create confirmation URL
     const confirmUrl = new URL(
-      "/api/auth/confirm",
+      "/api/auth/confirm-signup",
       process.env.NEXT_PUBLIC_SITE_URL,
     );
     confirmUrl.searchParams.set("token_hash", data.properties.hashed_token);

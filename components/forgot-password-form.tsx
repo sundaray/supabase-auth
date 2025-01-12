@@ -28,19 +28,18 @@ export function ForgotPasswordForm() {
   return (
     <div className="px-4 sm:mx-auto sm:max-w-sm">
       <h2 className="text-2xl font-semibold tracking-tight text-primary">
-        Reset Your Password
+        Reset your password
       </h2>
       <p className="mt-2 text-pretty text-sm text-muted-foreground">
         Type in your email and we'll send you a link to reset your password
       </p>
       <form
-        className="mt-12"
         id={form.id}
         onSubmit={form.onSubmit}
         action={formAction}
         noValidate
       >
-        <div className="grid gap-4">
+        <div className="mt-12 grid gap-4">
           {form.errors && (
             <div className="rounded border border-red-200 bg-red-50 py-2 text-center text-sm text-red-600">
               {form.errors}

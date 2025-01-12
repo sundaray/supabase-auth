@@ -7,6 +7,10 @@ import { emailSchema, resetPasswordSchema } from "@/schema";
 import { createClient } from "@/supabase/server";
 import { adminAuthClient } from "@/supabase/admin";
 
+/************************************************
+ * Forgot password
+ ************************************************/
+
 export async function requestPasswordReset(
   prevState: unknown,
   formData: FormData,
@@ -24,7 +28,6 @@ export async function requestPasswordReset(
   let errorOccured = false;
 
   try {
-    // Generate the magic link
     const { data, error } = await adminAuthClient.generateLink({
       type: "recovery",
       email,
@@ -33,7 +36,7 @@ export async function requestPasswordReset(
     if (error) throw error;
 
     const confirmUrl = new URL(
-      "/api/auth/confirm",
+      "/api/auth/confirm-recovery",
       process.env.NEXT_PUBLIC_SITE_URL,
     );
     confirmUrl.searchParams.set("token_hash", data.properties.hashed_token);
@@ -51,6 +54,10 @@ export async function requestPasswordReset(
     }
   }
 }
+
+/************************************************
+ * Reset password
+ ************************************************/
 
 export async function resetUserPassword(
   prevState: unknown,
@@ -77,8 +84,6 @@ export async function resetUserPassword(
       const response = await adminAuthClient.updateUserById(user.id, {
         password: submission.value.newPassword,
       });
-
-      console.log("Update user password response: ", response);
     }
   } catch (error) {
     return submission.reply({
