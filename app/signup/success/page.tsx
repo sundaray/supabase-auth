@@ -1,15 +1,14 @@
 import Link from "next/link";
-
 import { Icons } from "@/components/icons";
 
-export default function VerifyEmailPage() {
+export default function SignUpSuccessPage() {
   return (
     <div className="container mx-auto max-w-md text-center">
-      <h1 className="mb-4 mb-6 text-lg font-bold text-green-600">
-        Check Your Email
+      <h1 className="mb-6 text-lg font-bold text-green-600">
+        Sign Up Successful
       </h1>
-      <p className="mb-2 text-sm font-semibold leading-relaxed text-secondary-foreground">
-        We&apos;ve sent you an email confirmation link
+      <p className="mb-2 text-sm leading-relaxed text-muted-foreground">
+        Your have created an account
       </p>
       <Link
         href="/signin"

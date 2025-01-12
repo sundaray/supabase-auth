@@ -35,7 +35,7 @@ export function SignUpEmailForm({ next }: { next: string }) {
       noValidate
     >
       {form.errors && (
-        <div className="rounded border border-red-200 bg-red-50 p-2 text-center text-sm text-red-600">
+        <div className="text-pretty py-2 text-sm text-red-600">
           {form.errors}
         </div>
       )}

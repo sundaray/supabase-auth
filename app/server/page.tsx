@@ -8,7 +8,7 @@ export default async function ServerPage() {
 
   if (!user) {
     return (
-      <div className="mt-12 text-center">
+      <div className="text-center">
         <h1 className="text-xl font-medium text-red-600">
           User Not Authenticated
         </h1>
@@ -22,7 +22,7 @@ export default async function ServerPage() {
   }
 
   return (
-    <div className="mt-12 text-center">
+    <div className="text-center">
       <h1 className="text-xl font-medium text-green-600">User Authenticated</h1>
       <p className="mt-4 text-sm">User email: {user?.email}</p>
       <p className="mt-4 font-medium text-gray-700">

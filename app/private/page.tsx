@@ -1,6 +1,6 @@
 import { createClient } from "@/supabase/server";
 
-export default async function ProtectedPage() {
+export default async function PrivatePage() {
   const supabase = await createClient();
   const {
     data: { user },

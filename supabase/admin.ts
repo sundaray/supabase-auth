@@ -12,5 +12,4 @@ const supabase = createClient(
   },
 );
 
-// Access auth admin api
 export const adminAuthClient = supabase.auth.admin;

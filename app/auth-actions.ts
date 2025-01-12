@@ -1,13 +1,18 @@
 "use server";
 
 import { redirect } from "next/navigation";
-import { emailSchema, emailPasswordSchema } from "@/schema";
+import { createClient } from "@/supabase/server";
+import { adminAuthClient } from "@/supabase/admin";
 import { parseWithZod } from "@conform-to/zod";
+import {
+  emailSchema,
+  signInEmailPasswordSchema,
+  signUpEmailPasswordSchema,
+} from "@/schema";
+
 import { checkUserExists } from "@/lib/check-user-exists";
 import { sendEmailMagicLink } from "@/lib/send-email-magic-link";
 import { sendEmailPasswordSignUpLink } from "@/lib/send-email-password-signup-link";
-import { createClient } from "@/supabase/server";
-import { adminAuthClient } from "@/supabase/admin";
 
 /************************************************
  * Sign In With Google
@@ -32,7 +37,9 @@ export async function signInWithGoogle(next: string) {
       message: "Something went wrong. Please try again.",
     };
   } finally {
-    redirect(authUrl as string);
+    if (authUrl) {
+      redirect(authUrl);
+    }
   }
 }
 
@@ -75,7 +82,7 @@ export async function signInWithEmail(
 
     await sendEmailMagicLink(submission.value.email, confirmUrl.toString());
   } catch (error) {
-    console.log("Failed to send Email magic link: ", error);
+    console.log("Email magic link error: ", error);
     errorOccurred = true;
     return submission.reply({
       formErrors: ["Something went wrong. Please try again."],
@@ -97,7 +104,7 @@ export async function signUpWithEmailAndPassword(
   formData: FormData,
 ) {
   const submission = parseWithZod(formData, {
-    schema: emailPasswordSchema,
+    schema: signUpEmailPasswordSchema,
   });
 
   if (submission.status !== "success") {
@@ -122,39 +129,33 @@ export async function signUpWithEmailAndPassword(
       throw checkError;
     }
 
+    // User exists and has already signed up
     if (exists && hasSignedUp) {
       return submission.reply({
         formErrors: ["An account with this email already exists."],
       });
     }
 
-    if (exists && !hasSignedUp && id) {
+    // User exists but hasn't signed up
+    if (exists && id && !hasSignedUp) {
       const supabase = await createClient();
 
       // Update the user's password
-      const { data: updatedUser, error: updateError } =
-        await adminAuthClient.updateUserById(id, {
-          password,
-        });
-
-      if (updateError) {
-        throw updateError;
-      }
+      await adminAuthClient.updateUserById(id, {
+        password,
+      });
 
       // Append "signup" to the `providers` array
-      const { error: rpcError } = await supabase.rpc("add_provider", {
+      await supabase.rpc("add_provider", {
         user_id: id,
         provider: "signup",
       });
 
-      if (rpcError) {
-        throw rpcError;
-      }
-
       existingUserSignUpSuccessful = true;
+      return;
     }
 
-    // At this point, user doesn't exist at all (first time signup)
+    // New user (first time signup)
     const { data, error } = await adminAuthClient.generateLink({
       type: "signup",
       email,
@@ -172,7 +173,7 @@ export async function signUpWithEmailAndPassword(
     confirmUrl.searchParams.set("type", "signup");
     confirmUrl.searchParams.set("next", next);
 
-    // Send email with confirmation link
+    // Send email with sign-up link
     await sendEmailPasswordSignUpLink(email, confirmUrl.toString());
 
     newUserSignUpSuccessful = true;
@@ -186,7 +187,7 @@ export async function signUpWithEmailAndPassword(
       redirect("/signup/check-email");
     }
     if (existingUserSignUpSuccessful) {
-      redirect("/signin");
+      redirect("/signup/success");
     }
   }
 }
@@ -201,7 +202,7 @@ export async function signInWithEmailAndPassword(
   formData: FormData,
 ) {
   const submission = parseWithZod(formData, {
-    schema: emailPasswordSchema,
+    schema: signInEmailPasswordSchema,
   });
 
   if (submission.status !== "success") {
@@ -213,7 +214,7 @@ export async function signInWithEmailAndPassword(
   try {
     const supabase = await createClient();
 
-    const { data, error } = await supabase.auth.signInWithPassword({
+    const { error } = await supabase.auth.signInWithPassword({
       email: submission.value.email,
       password: submission.value.password,
     });
@@ -234,7 +235,6 @@ export async function signInWithEmailAndPassword(
       formErrors: ["Something went wrong. Please try again."],
     });
   } finally {
-    // Only redirect if no errors occurred
     if (!errorOccurred) {
       redirect(next);
     }

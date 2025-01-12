@@ -1,7 +1,7 @@
 "use server";
 
-import { parseWithZod } from "@conform-to/zod";
 import { redirect } from "next/navigation";
+import { parseWithZod } from "@conform-to/zod";
 import { sendPasswordResetLink } from "@/lib/send-password-reset-link";
 import { emailSchema, resetPasswordSchema } from "@/schema";
 import { createClient } from "@/supabase/server";
@@ -24,7 +24,6 @@ export async function requestPasswordReset(
   }
 
   const email = submission.value.email;
-
   let errorOccured = false;
 
   try {
@@ -72,6 +71,7 @@ export async function resetUserPassword(
   }
 
   let errorOccured = false;
+  let userExists = true;
 
   try {
     const supabase = await createClient();
@@ -79,7 +79,11 @@ export async function resetUserPassword(
       data: { user },
     } = await supabase.auth.getUser();
 
-    // Update the user's password
+    if (!user) {
+      userExists = false;
+      errorOccured = true;
+    }
+
     if (user && user.id) {
       const response = await adminAuthClient.updateUserById(user.id, {
         password: submission.value.newPassword,
@@ -92,6 +96,9 @@ export async function resetUserPassword(
   } finally {
     if (!errorOccured) {
       redirect("/reset-password/success");
+    }
+    if (!userExists) {
+      redirect("/signin");
     }
   }
 }

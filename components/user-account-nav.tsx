@@ -18,7 +18,7 @@ export async function UserAccountNav() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  // console.log("User inside user account nav: ", user);
+  console.log("User inside user account nav: ", user);
 
   if (!user) {
     return (
@@ -28,7 +28,7 @@ export async function UserAccountNav() {
           size: "sm",
         })}
       >
-        Sign in
+        Sign In
       </Link>
     );
   }
@@ -37,7 +37,7 @@ export async function UserAccountNav() {
     <DropdownMenu>
       <DropdownMenuTrigger>
         <Avatar>
-          {/* <AvatarImage src={user?.image || undefined} /> */}
+          <AvatarImage src={user?.user_metadata?.picture || undefined} />
           <AvatarFallback>
             {user!.email!.slice(0, 2).toUpperCase()}
           </AvatarFallback>

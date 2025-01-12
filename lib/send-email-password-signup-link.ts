@@ -1,5 +1,5 @@
 import { resend } from "@/lib/resend";
-import { EmailPasswordSignUpLinkTemplate } from "@/components/email-password-signup-link-template";
+import { EmailPasswordSignUpLinkTemplate } from "@/email/email-password-signup-link-template";
 
 export async function sendEmailPasswordSignUpLink(email: string, url: string) {
   try {

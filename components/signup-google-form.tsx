@@ -16,7 +16,7 @@ export function SignUpGoogleForm({ next }: { next: string }) {
   return (
     <form action={formAction} className="grid gap-2">
       {formState !== undefined && formState?.error && (
-        <div className="text-pretty rounded border border-red-200 bg-red-50 p-2 text-center text-sm text-red-600">
+        <div className="text-pretty py-2 text-sm text-red-600">
           {formState?.message}
         </div>
       )}

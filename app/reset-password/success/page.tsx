@@ -4,7 +4,7 @@ import { Icons } from "@/components/icons";
 export default function ResetPasswordSuccessPage() {
   return (
     <div className="container mx-auto max-w-md text-center">
-      <h1 className="mb-4 mb-6 text-lg font-bold text-green-600">
+      <h1 className="mb-6 text-lg font-bold text-green-600">
         Password Reset Successful
       </h1>
       <p className="mb-2 text-sm leading-relaxed text-muted-foreground">

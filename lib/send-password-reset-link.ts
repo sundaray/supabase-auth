@@ -1,7 +1,6 @@
 import "server-only";
 import { resend } from "@/lib/resend";
-import { PasswordResetLinkTemplate } from "@/components/password-reset-link-template";
-import { PasswordResetError } from "@/lib/password-reset-error";
+import { PasswordResetLinkTemplate } from "@/email/password-reset-link-template";
 
 export async function sendPasswordResetLink(email: string, url: string) {
   try {
@@ -14,7 +13,6 @@ export async function sendPasswordResetLink(email: string, url: string) {
 
     if (error) {
       console.log("Failed to send password reset link: ", error);
-      throw new PasswordResetError("EMAIL_NOT_SENT");
     }
   } catch (error) {
     console.log(
