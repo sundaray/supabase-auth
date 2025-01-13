@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
       } = await supabase.auth.getUser();
 
       if (user) {
-        await saveUser(user.id, user.email, type);
+        await saveUser(user.id, user.email!, type);
       }
       return NextResponse.redirect(`${origin}${next}`);
     }

@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { createClient } from "@/supabase/server";
-import { saveUser } from "@/lib/save-user";
 
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
