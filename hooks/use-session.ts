@@ -1,12 +1,15 @@
 import { useEffect, useState } from "react";
 import type { Session } from "@supabase/supabase-js";
 import { createClient } from "@/supabase/client";
+import { getUserRole } from "@/lib/get-user-role";
 
 type SessionStatus = "loading" | "authenticated" | "unauthenticated";
 
 export function useSession() {
   const [session, setSession] = useState<Session | null>(null);
   const [status, setStatus] = useState<SessionStatus>("loading");
+  const [role, setRole] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     async function retrieveSession() {
@@ -14,16 +17,20 @@ export function useSession() {
       try {
         const {
           data: { session },
-          error,
         } = await supabase.auth.getSession();
-        if (session) {
-          setSession(session);
-          setStatus("authenticated");
+
+        if (!session) {
+          setStatus("unauthenticated");
           return;
         }
-        setStatus("unauthenticated");
+
+        const { role } = await getUserRole(session.user.id);
+        setSession(session);
+        setRole(role);
+        setStatus("authenticated");
       } catch (error) {
-        setSession(null);
+        console.error("Session fetch error:", error);
+        setError("Failed to check authentication status");
         setStatus("unauthenticated");
       }
     }
@@ -31,5 +38,5 @@ export function useSession() {
     retrieveSession();
   }, []);
 
-  return { session, status };
+  return { error, session, status, role };
 }

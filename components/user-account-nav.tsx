@@ -18,8 +18,6 @@ export async function UserAccountNav() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  console.log("User inside user account nav: ", user);
-
   if (!user) {
     return (
       <Link

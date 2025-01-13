@@ -9,7 +9,7 @@ export async function GET() {
 
   if (!user) {
     const callbackUrl = encodeURIComponent("/route-handler");
-    redirect(`/signin?from=${callbackUrl}`);
+    redirect(`/signin?next=${callbackUrl}`);
   }
 
   const data = [

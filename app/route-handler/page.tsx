@@ -40,7 +40,7 @@ export default function RouteHandlerPage() {
   };
 
   return (
-    <div className="mx-auto mt-12 max-w-xl px-4">
+    <div className="mx-auto max-w-xl px-4">
       <div className="flex flex-col items-center space-y-8">
         <Button onClick={handleFetchData} disabled={isLoading}>
           {isLoading ? (
@@ -57,8 +57,8 @@ export default function RouteHandlerPage() {
           <div className="grid gap-4">
             {data.map((item) => (
               <div key={item.id} className="rounded-md border p-4">
-                <h3 className="font-medium">{item.title}</h3>
-                <p className="mt-2 text-gray-700">{item.description}</p>
+                <h3 className="font-semibold">{item.title}</h3>
+                <p className="mt-2 text-muted-foreground">{item.description}</p>
               </div>
             ))}
           </div>

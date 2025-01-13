@@ -1,27 +1,22 @@
-import { User } from "next-auth";
+import { createClient } from "@/supabase/client";
 
-import { supabase } from "@/lib/supabase";
+export async function getUserRole(userId: string) {
+  const supabase = await createClient();
 
-export async function getUserRole(user: User) {
   try {
-    const { data: userData, error } = await supabase
-      .schema("next_auth")
+    const { data: user } = await supabase
       .from("users")
       .select("role")
-      .eq("email", user.email!)
+      .eq("id", userId!)
       .single();
 
-    if (error) {
-      return { success: false };
-    }
-
     return {
-      success: true,
-      role: userData.role,
+      role: user?.role,
     };
   } catch (error) {
+    console.log("getUserRole error: ", error);
     return {
-      success: false,
+      role: null,
     };
   }
 }

@@ -1,4 +1,5 @@
 import { createClient } from "@/supabase/server";
+import { getUserRoleServer } from "@/lib/get-user-role-server";
 
 export default async function AdminPage() {
   const supabase = await createClient();
@@ -6,11 +7,15 @@ export default async function AdminPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (user?.role === "user") {
+  const { role } = await getUserRoleServer();
+
+  if (user && role !== "admin") {
     return (
-      <div className="mx-auto max-w-lg text-center">
-        <h1 className="text-xl font-medium text-red-600">Admin Access Only</h1>
-        <p className="mt-4 text-pretty font-medium text-gray-700">
+      <div className="px-4 text-center">
+        <h1 className="text-lg font-semibold text-red-600">
+          Admin Access Only
+        </h1>
+        <p className="mt-4 text-pretty font-medium text-muted-foreground">
           This page is only accessible to authenticated users having
           &quot;admin&quot; status.
         </p>
@@ -19,8 +24,13 @@ export default async function AdminPage() {
   }
 
   return (
-    <h1 className="text-center text-xl font-medium text-green-600">
-      Welcome Admin
-    </h1>
+    <div className="px-4 text-center">
+      <h1 className="text-lg font-semibold text-green-600">Welcome Admin</h1>
+      <p className="mt-4 text-sm">User email: {user?.email}</p>
+      <p className="mt-4 text-pretty font-medium text-muted-foreground">
+        This page is only accessible to authenticated users having
+        &quot;admin&quot; status.
+      </p>
+    </div>
   );
 }
